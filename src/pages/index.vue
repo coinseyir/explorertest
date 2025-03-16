@@ -45,7 +45,7 @@ const chainStore = useBlockchain()
           viewBox="0 0 150.000000 132.000000"
           preserveAspectRatio="xMidYMid meet">
           <g transform="translate(0.000000,132.000000) scale(0.100000,-0.100000)"
-          :fill="chainStore.current?.themeColor||'#666CFF'" class=" dark:invert" stroke="none">
+          :fill="chainStore.current?.themeColor||'#666CFF'" class="dark:invert" stroke="none">
             <path d="M500 1310 l-125 -5 -182 -315 c-100 -173 -182 -321 -182 -329 -1 -7
             81 -159 181 -337 l183 -324 372 0 371 0 186 325 c102 179 186 330 186 337 0 7
             -82 157 -182 335 l-183 323 -250 -2 c-137 -1 -306 -5 -375 -8z m588 -454 c61
@@ -61,12 +61,12 @@ const chainStore = useBlockchain()
           </g>
         </svg>
       </div>
-      <h1 class="text-primary dark:invert text-3xl md:!text-6xl font-bold">
+      <h1 class="text-indigo-500 dark:invert text-3xl md:!text-6xl font-bold">
         {{ $t('pages.title') }}
       </h1>
     </div>
     <div class="text-center text-base">
-      <p class="mb-1">
+      <p class="mb-1 text-gray-600 dark:text-gray-100">
         {{ $t('pages.slogan') }}
       </p>
     </div>
@@ -77,41 +77,41 @@ const chainStore = useBlockchain()
       <progress class="progress progress-info w-80 h-1"></progress>
     </div>
 
-    <div v-if="featured.length>0" class="text-center text-base mt-6 text-primary">
-      <h2 class="mb-6"> Featured Blockchains 🔥 </h2>
-    </div>
+<div v-if="featured.length>0" class="text-center text-base mt-6 text-indigo-500">
+  <h2 class="mb-6"> Featured Blockchains 🔥 </h2>
+</div>
 
-    <div v-if="featured.length>0"
-      class="grid grid-cols-1 gap-4 mt-6 md:!grid-cols-3 lg:!grid-cols-4 2xl:!grid-cols-5"
-    >
-    <ChainSummary
-        v-for="(chain, index) in featured"
-        :key="index"
-        :name="chain.chainName"
-      />
-    </div>
+<div v-if="featured.length>0"
+  class="grid grid-cols-1 gap-4 mt-6 md:!grid-cols-3 lg:!grid-cols-4 2xl:!grid-cols-5"
+>
+<ChainSummary
+    v-for="(chain, index) in featured"
+    :key="index"
+    :name="chain.chainName"
+  />
+</div>
 
-    <AdBanner id="home-banner-ad" unit="banner" width="970px" height="90px" />
+<AdBanner id="home-banner-ad" unit="banner" width="970px" height="90px" />
 
-    <div class="text-center text-base mt-6 text-primary">
-      <h2 class="mb-6">{{ $t('pages.description') }}</h2>
-    </div>
+<div class="text-center text-base mt-6 text-indigo-500">
+  <h2 class="mb-6">{{ $t('pages.description') }}</h2>
+</div>
 
-    <div class="flex items-center rounded-lg bg-base-100  border border-gray-200 dark:border-gray-700 mt-10">
-      <Icon icon="mdi:magnify" class="text-2xl text-gray-400 ml-3"/>
-      <input :placeholder="$t('pages.search_placeholder')" class="px-4 h-10 bg-transparent flex-1 outline-none text-base" v-model="keywords" />
-      <div class="px-4 text-base hidden md:!block">{{ chains.length }}/{{ dashboard.length }}</div>
-    </div>
+<div class="flex items-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-10">
+  <Icon icon="mdi:magnify" class="text-2xl text-gray-400 ml-3"/>
+  <input :placeholder="$t('pages.search_placeholder')" class="px-4 h-10 bg-transparent flex-1 outline-none text-base text-gray-600 dark:text-gray-100" v-model="keywords" />
+  <div class="px-4 text-base text-gray-600 dark:text-gray-100 hidden md:!block">{{ chains.length }}/{{ dashboard.length }}</div>
+</div>
 
-    <div
-      class="grid grid-cols-1 gap-4 mt-6 md:!grid-cols-3 lg:!grid-cols-4 2xl:!grid-cols-5"
-    >
-      <ChainSummary
-        v-for="(chain, index) in chains"
-        :key="index"
-        :name="chain.chainName"
-      />
-    </div>
+<div
+  class="grid grid-cols-1 gap-4 mt-6 md:!grid-cols-3 lg:!grid-cols-4 2xl:!grid-cols-5"
+>
+  <ChainSummary
+    v-for="(chain, index) in chains"
+    :key="index"
+    :name="chain.chainName"
+  />
+</div>
   </div>
 </template>
 
@@ -119,4 +119,4 @@ const chainStore = useBlockchain()
  .logo path{
   fill: #171d30;
 }
-</style>@/components/ad/ad
+</style>
