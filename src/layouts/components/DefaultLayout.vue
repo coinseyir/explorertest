@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue';
 import { computed, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router'; // RouterLink ve useRoute ekleniyor
+import { RouterLink, useRoute } from 'vue-router';
 import type { NavGroup, NavLink, NavSectionTitle, VerticalNavItems } from '../types';
 
 // Components
@@ -53,15 +53,15 @@ const changeOpen = (index: number) => {
   }
 };
 
-const isNavGroup = (nav: VerticalNavItems): nav is NavGroup => {
+const isNavGroup = (nav: VerticalNavItems[number]): nav is NavGroup => {
   return (nav as NavGroup).children !== undefined;
 };
 
-const isNavLink = (nav: VerticalNavItems): nav is NavLink => {
+const isNavLink = (nav: VerticalNavItems[number]): nav is NavLink => {
   return (nav as NavLink).to !== undefined;
 };
 
-const isNavTitle = (nav: VerticalNavItems): nav is NavSectionTitle => {
+const isNavTitle = (nav: VerticalNavItems[number]): nav is NavSectionTitle => {
   return (nav as NavSectionTitle).heading !== undefined;
 };
 
@@ -154,13 +154,13 @@ const behind = computed(() => {
             </div>
           </div>
           <div class="collapse-content">
-            <div v-for="(el, key) of item?.children" class="menu bg-white dark:bg-gray-800 w-full !p-0">
+            <div v-for="(el, key) of item.children" :key="key" class="menu bg-white dark:bg-gray-800 w-full !p-0">
               <RouterLink
                 v-if="isNavLink(el)"
                 @click="sidebarShow = false"
                 class="hover:bg-blue-50 dark:hover:bg-blue-900 rounded cursor-pointer px-3 py-2 flex items-center"
                 :class="{
-                  '!bg-indigo-500': selected($route, el),
+                  '!bg-indigo-500': selected(route, el),
                 }"
                 :to="el.to"
               >
@@ -170,7 +170,7 @@ const behind = computed(() => {
                   class="mr-2 ml-3"
                   :class="{
                     'text-white':
-                      $route.path === el?.to?.path &&
+                      route.path === el?.to?.path &&
                       item?.title !== 'Favorite',
                   }"
                 />
@@ -179,13 +179,13 @@ const behind = computed(() => {
                   :src="el?.icon?.image"
                   class="w-6 h-6 rounded-full mr-3 ml-4"
                   :class="{
-                    'border border-gray-300 bg-white': selected($route, el),
+                    'border border-gray-300 bg-white': selected(route, el),
                   }"
                 />
                 <div
                   class="text-base capitalize text-gray-600 dark:text-gray-300"
                   :class="{
-                    '!text-white': selected($route, el),
+                    '!text-white': selected(route, el),
                   }"
                 >
                   {{ item?.title === 'Favorite' ? el?.title : $t(el?.title) }}
@@ -218,7 +218,7 @@ const behind = computed(() => {
 
         <RouterLink
           v-if="isNavLink(item)"
-          :to="item?.to"
+          :to="item.to"
           @click="sidebarShow = false"
           class="cursor-pointer rounded-lg px-4 flex items-center py-2 hover:bg-blue-50 dark:hover:bg-blue-900"
         >
