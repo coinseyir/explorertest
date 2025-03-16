@@ -10,7 +10,6 @@ function changeEndpoint(item: Endpoint) {
   if (chainStore.current) router.push(`/${chainStore.current.chainName}`);
 }
 </script>
-
 <template>
   <div class="dropdown">
     <label tabindex="0" class="flex items-center">
@@ -18,8 +17,8 @@ function changeEndpoint(item: Endpoint) {
         <img v-lazy="chainStore.logo" class="w-9 h-9 rounded-full" />
         <div
           class="w-2 h-2 rounded-full absolute right-0 bottom-0 shadow" :class="{
-            'bg-success': baseStore.connected,
-            'bg-error': !baseStore.connected
+            'bg-green-500': baseStore.connected,
+            'bg-red-500': !baseStore.connected
           }"
         ></div>
       </div>
@@ -30,16 +29,16 @@ function changeEndpoint(item: Endpoint) {
             chainStore.chainName ||
             ''
           "
-          class="capitalize whitespace-nowrap text-base font-semibold text-gray-600 dark:text-gray-200 hidden md:!block"
+          class="capitalize whitespace-nowrap text-base font-semibold text-gray-600 dark:text-gray-100 hidden md:!block"
         >
           {{ 
             baseStore.latest?.block?.header?.height
               ? `#${baseStore.latest.block.header.height}`
               : chainStore.chainName  || '' 
-          }} <span class="text-error">{{ baseStore.connected ? '' : 'disconnected' }}</span>
+          }} <span class="text-red-500">{{ baseStore.connected ? '' : 'disconnected' }}</span>
         </div>
         <div
-          class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap hidden md:!block"
+          class="text-xs text-gray-500 dark:text-gray-300 whitespace-nowrap hidden md:!block"
         >
           {{ chainStore.connErr || chainStore.endpoint.address }}
         </div>
@@ -47,29 +46,29 @@ function changeEndpoint(item: Endpoint) {
     </label>
     <div
       tabindex="0"
-      class="dropdown-content -left-6 w-80 menu shadow bg-base-200 rounded-box overflow-auto"
+      class="dropdown-content -left-6 w-80 menu shadow bg-white dark:bg-gray-800 rounded-box overflow-auto"
     >
       <!-- rest -->
       <div
-        class="px-4 py-2 text-sm text-gray-400"
+        class="px-4 py-2 text-sm text-gray-500"
         v-if="chainStore.current?.endpoints?.rest"
       >
         Rest Endpoint
       </div>
       <div
         v-for="(item, index) in chainStore.current?.endpoints?.rest"
-        class="px-4 py-2 w-full hover:bg-gray-100 dark:hover:bg-[#384059] cursor-pointer"
+        class="px-4 py-2 w-full hover:bg-blue-50 dark:hover:bg-blue-900 cursor-pointer"
         :key="index"
         @click="changeEndpoint(item)"
       >
         <div class="flex flex-col">
           <div class="flex items-center justify-between w-full">
-            <div class="text-gray-500 dark:text-gray-200 capitalize">
+            <div class="text-gray-600 dark:text-gray-100 capitalize">
               {{ item.provider }}
             </div>
             <span
               v-if="item.address === chainStore.endpoint?.address"
-              class="bg-yes inline-block h-2 w-2 rounded-full"
+              class="bg-green-500 inline-block h-2 w-2 rounded-full"
             />
           </div>
           <div class="text-gray-400 text-xs whitespace-nowrap">
@@ -77,23 +76,24 @@ function changeEndpoint(item: Endpoint) {
           </div>
         </div>
       </div>
-
-      <!-- rest -->
-      <div class="px-4 py-2 text-sm text-gray-400">Information</div>
-      <div class="w-full">
-        <div class="py-2 px-4">
-          Chain Id: {{ baseStore.latest.block?.header.chain_id && baseStore.connected
-                        ? baseStore.latest.block.header.chain_id
-                        : 'N/A' }}
-        </div>
-        <div class="py-2 px-4">
-          Height: {{ baseStore.latest.block?.header.height && baseStore.connected
-                      ? baseStore.latest.block.header.height
-                      : '0' }}
-        </div>
-      </div>
-      <!-- bottom-->
-      <div class="px-4 py-2">&nbsp;</div>
+  <!-- rest -->
+  <div class="px-4 py-2 text-sm text-gray-500">Information</div>
+  <div class="w-full">
+    <div class="py-2 px-4">
+      Chain Id: {{ baseStore.latest.block?.header.chain_id && baseStore.connected
+                    ? baseStore.latest.block.header.chain_id
+                    : 'N/A' }}
+    </div>
+    <div class="py-2 px-4">
+      Height: {{ baseStore.latest.block?.header.height && baseStore.connected
+                  ? baseStore.latest.block.header.height
+                  : '0' }}
     </div>
   </div>
+  <!-- bottom-->
+  <div class="px-4 py-2"> </div>
+</div>
+
+  </div>
 </template>
+
