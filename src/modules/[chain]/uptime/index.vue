@@ -39,7 +39,7 @@ interface ValidatorUnit {
 }
 
 function padding(blocks: BlockColor[] = []) {
-  const raw = Array(50).fill({ height: "0", color: 'bg-secondary' } as BlockColor).concat(blocks)
+  const raw = Array(50).fill({ height: "0", color: 'bg-gray-400' } as BlockColor).concat(blocks)
   return raw.slice(raw.length - 50);
 }
 
@@ -92,13 +92,11 @@ baseStore.$subscribe((_, state) => {
   const newHeight = Number(state.latest?.block?.header?.height || 0)
   if (newHeight > latest.value) {
     latest.value = newHeight;
-    // initialize if it's the first time
     if(!preload.value) {
       preFill();
       preload.value = true;
     }
 
-    // reset the consumer validators
     if (newHeight > 0 && consumerValidators.value.length === 0) {
       const chain_id = state.latest.block.header.chain_id;
       Promise.resolve().then(async () =>{
@@ -121,7 +119,6 @@ baseStore.$subscribe((_, state) => {
 onMounted(() => {
   live.value = true;
 
-  // fill the recent blocks
   baseStore.recents?.forEach((b) => {
     fillblock(b, 'start');
   });
@@ -136,13 +133,11 @@ onMounted(() => {
 function preFill() {
 
   if(latest.value > 50 && baseStore.recents.length >= 49 ) return
-  // preload 50 blocks if recent blocks are not enough
   let promise = Promise.resolve();
   for (let i = latest.value - baseStore.recents.length; i > latest.value - 50 && i > 1; i -= 1) {
     promise = promise.then(() =>
       new Promise((resolve) => {
         if (live.value) {
-          // continue only if the page is living
           if (i > latest.value - 50)
             baseStore.fetchBlock(i).then((x) => {
               fillblock(x, 'start');
@@ -189,7 +184,6 @@ onUnmounted(() => {
   live.value = false;
 });
 
-//const tab = ref(window.location.hash.search("block")>-1?"2":"3")
 const tab = ref('2');
 function changeTab(v: string) {
   tab.value = v;
@@ -200,110 +194,108 @@ function changeTab(v: string) {
 <template>
   <div>
     <div class="tabs tabs-boxed bg-transparent mb-4">
-      <a class="tab text-gray-400 capitalize" :class="{ 'tab-active': tab === '3' }" @click="changeTab('3')">{{
+      <a class="tab text-gray-600 dark:text-gray-300 capitalize" :class="{ 'tab-active': tab === '3' }" @click="changeTab('3')">{{
         $t('uptime.overall') }}</a>
-      <a class="tab text-gray-400 capitalize" :class="{ 'tab-active': tab === '2' }" @click="changeTab('2')">{{
+      <a class="tab text-gray-600 dark:text-gray-300 capitalize" :class="{ 'tab-active': tab === '2' }" @click="changeTab('2')">{{
         $t('module.blocks') }}</a>
       <RouterLink :to="`/${chain}/uptime/customize`">
-        <a class="tab text-gray-400 capitalize">{{ $t('uptime.customize') }}</a>
+        <a class="tab text-gray-600 dark:text-gray-300 capitalize">{{ $t('uptime.customize') }}</a>
       </RouterLink>
     </div>
-    <div class="bg-base-100 px-5 pt-5">
+    <div class="bg-white dark:bg-gray-800 px-5 pt-5 border border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-x-4">
         <input type="text" v-model="keyword" placeholder="Keywords to filter validators"
-          class="input input-sm w-full flex-1 border border-gray-200 dark:border-gray-600" />
+          class="input input-sm w-full flex-1 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-100" />
       </div>
 
-      <!-- grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-4 mt-4 -->
-      <div :class="tab === '2' ? '' : 'hidden'">
-        <div class="flex flex-row flex-wrap gap-x-4 mt-4 justify-center">
-          <div v-for="(unit, i) in grid" :key="i">
-            <div class="flex justify-between py-0 w-[248px]">
-              <label class="truncate text-sm">
-                <span class="ml-1 text-black dark:text-white">{{ i + 1 }}.{{ unit.moniker }}</span>
-              </label>
-              <div v-if="Number(unit?.missed_blocks_counter || 0) > 10"
-                class="badge badge-sm bg-transparent border-0 text-red-500 font-bold">
-                {{ unit?.missed_blocks_counter }}
-              </div>
-              <div v-else class="badge badge-sm bg-transparent text-green-600 border-0 font-bold">
-                {{ unit?.missed_blocks_counter }}
-              </div>
-            </div>
-            <UptimeBar :blocks="unit.blocks" />
+  <div :class="tab === '2' ? '' : 'hidden'">
+    <div class="flex flex-row flex-wrap gap-x-4 mt-4 justify-center">
+      <div v-for="(unit, i) in grid" :key="i">
+        <div class="flex justify-between py-0 w-[248px]">
+          <label class="truncate text-sm">
+            <span class="ml-1 text-gray-800 dark:text-gray-100">{{ i + 1 }}.{{ unit.moniker }}</span>
+          </label>
+          <div v-if="Number(unit?.missed_blocks_counter || 0) > 10"
+            class="badge badge-sm bg-transparent border-0 text-red-500 font-bold">
+            {{ unit?.missed_blocks_counter }}
+          </div>
+          <div v-else class="badge badge-sm bg-transparent text-green-600 border-0 font-bold">
+            {{ unit?.missed_blocks_counter }}
           </div>
         </div>
-        <div class="mt-5 text-xs flex justify-center gap-2">
-          <span class=" font-bold">{{ $t('uptime.legend') }}: </span>
-          <span class="bg-green-500">&nbsp;</span> {{ $t('uptime.committed') }}
-          <span class="bg-yellow-500">&nbsp;</span> {{ $t('uptime.precommitted') }}
-          <span class="bg-red-500">&nbsp;</span> {{ $t('uptime.missed') }}
-        </div>
+        <UptimeBar :blocks="unit.blocks" />
       </div>
-
-      <div :class="tab === '3' ? '' : 'hidden'" class="overflow-x-auto">
-        <table class="table table-compact w-full mt-5">
-          <thead class="capitalize bg-base-200">
-            <tr>
-              <td>{{ $t('account.validator') }}</td>
-              <td class="text-right">{{ $t('module.uptime') }}</td>
-              <td>{{ $t('uptime.last_jailed_time') }}</td>
-              <td class="text-right">{{ $t('uptime.signed_precommits') }}</td>
-              <td class="text-right">{{ $t('uptime.start_height') }}</td>
-              <td>{{ $t('uptime.tombstoned') }}</td>
-            </tr>
-          </thead>
-          <tr v-for="(v, i) in grid" class="hover">
-            <td>
-              <div class="truncate max-w-sm">
-                {{ i + 1 }}. {{ v.moniker }}
-              </div>
-            </td>
-            <td class="text-right">
-              <span :class="v.uptime && v.uptime > 0.95 ? 'text-green-500' : 'text-red-500'
-        ">
-                <div class="tooltip" :data-tip="`${v.missed_blocks_counter} missing blocks`">
-                  {{ format.percent(v.uptime) }}
-                </div>
-              </span>
-            </td>
-            <td>
-              <span v-if="v.signing && !v.signing.jailed_until.startsWith('1970')">
-                <div class="tooltip" :data-tip="format.toDay(v.signing.jailed_until, 'long')">
-                  <span>{{ format.toDay(v.signing.jailed_until, 'from') }}</span>
-                </div>
-              </span>
-            </td>
-            <td class="text-xs text-right">
-              <span v-if="v.signing && v.signing.jailed_until.startsWith('1970')" class="text-right">{{
-        format.percent(
-          Number(v.signing.index_offset) /
-          (latest - Number(v.signing.start_height))
-        )
-      }}</span>
-              {{ v.signing?.index_offset }}
-            </td>
-            <td class="text-right">{{ v.signing?.start_height }}</td>
-            <td class="capitalize">{{ v.signing?.tombstoned }}</td>
-          </tr>
-          <tfoot>
-            <tr>
-              <td colspan="2" class="text-right">
-                {{ $t('uptime.minimum_uptime') }}:
-                <span class="lowercase tooltip" :data-tip="`Window size: ${slashingParam.signed_blocks_window}`"><span
-                    class="ml-2 btn btn-error btn-xs">{{
-        format.percent(slashingParam.min_signed_per_window)
-                    }}</span>
-                </span>
-              </td>
-              <td colspan="8"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="h-6"></div>
     </div>
+    <div class="mt-5 text-xs flex justify-center gap-2 text-gray-600 dark:text-gray-300">
+      <span class=" font-bold">{{ $t('uptime.legend') }}: </span>
+      <span class="bg-green-500"> </span> {{ $t('uptime.committed') }}
+      <span class="bg-yellow-500"> </span> {{ $t('uptime.precommitted') }}
+      <span class="bg-red-500"> </span> {{ $t('uptime.missed') }}
+    </div>
+  </div>
+
+  <div :class="tab === '3' ? '' : 'hidden'" class="overflow-x-auto">
+    <table class="table table-compact w-full mt-5">
+      <thead class="capitalize bg-white dark:bg-gray-800">
+        <tr>
+          <td>{{ $t('account.validator') }}</td>
+          <td class="text-right">{{ $t('module.uptime') }}</td>
+          <td>{{ $t('uptime.last_jailed_time') }}</td>
+          <td class="text-right">{{ $t('uptime.signed_precommits') }}</td>
+          <td class="text-right">{{ $t('uptime.start_height') }}</td>
+          <td>{{ $t('uptime.tombstoned') }}</td>
+        </tr>
+      </thead>
+      <tr v-for="(v, i) in grid" class="hover:bg-blue-50 dark:hover:bg-blue-900">
+        <td>
+          <div class="truncate max-w-sm text-gray-800 dark:text-gray-100">
+            {{ i + 1 }}. {{ v.moniker }}
+          </div>
+        </td>
+        <td class="text-right">
+          <span :class="v.uptime && v.uptime > 0.95 ? 'text-green-500' : 'text-red-500'
+    ">
+            <div class="tooltip" :data-tip="`${v.missed_blocks_counter} missing blocks`">
+              {{ format.percent(v.uptime) }}
+            </div>
+          </span>
+        </td>
+        <td>
+          <span v-if="v.signing && !v.signing.jailed_until.startsWith('1970')">
+            <div class="tooltip" :data-tip="format.toDay(v.signing.jailed_until, 'long')">
+              <span class="text-gray-600 dark:text-gray-300">{{ format.toDay(v.signing.jailed_until, 'from') }}</span>
+            </div>
+          </span>
+        </td>
+        <td class="text-xs text-right text-gray-600 dark:text-gray-300">
+          <span v-if="v.signing && v.signing.jailed_until.startsWith('1970')" class="text-right">{{
+    format.percent(
+      Number(v.signing.index_offset) /
+      (latest - Number(v.signing.start_height))
+    )
+  }}</span>
+          {{ v.signing?.index_offset }}
+        </td>
+        <td class="text-right text-gray-600 dark:text-gray-300">{{ v.signing?.start_height }}</td>
+        <td class="capitalize text-gray-600 dark:text-gray-300">{{ v.signing?.tombstoned }}</td>
+      </tr>
+      <tfoot>
+        <tr>
+          <td colspan="2" class="text-right text-gray-600 dark:text-gray-300">
+            {{ $t('uptime.minimum_uptime') }}:
+            <span class="lowercase tooltip" :data-tip="`Window size: ${slashingParam.signed_blocks_window}`"><span
+                class="ml-2 btn btn-error btn-xs text-white">{{ format.percent(slashingParam.min_signed_per_window)
+                }}</span>
+            </span>
+          </td>
+          <td colspan="8"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="h-6"></div>
+</div>
   </div>
 </template>
 <route>
